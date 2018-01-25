@@ -25,12 +25,12 @@ public:
 
 	static MSyntax newSyntax() {
 		MSyntax syntax;
-		syntax.addFlag(STARTX, STARTXLONG, MSyntax::kDouble);
-		syntax.addFlag(STARTY, STARTYLONG, MSyntax::kDouble);
-		syntax.addFlag(STARTZ, STARTZLONG, MSyntax::kDouble);
-		syntax.addFlag(ENDX, ENDXLONG, MSyntax::kDouble);
-		syntax.addFlag(ENDY, ENDYLONG, MSyntax::kDouble);
-		syntax.addFlag(ENDZ, ENDZLONG, MSyntax::kDouble);
+		syntax.addFlag(STARTX, STARTXLONG, MSyntax::kString);
+		syntax.addFlag(STARTY, STARTYLONG, MSyntax::kString);
+		syntax.addFlag(STARTZ, STARTZLONG, MSyntax::kString);
+		syntax.addFlag(ENDX, ENDXLONG, MSyntax::kString);
+		syntax.addFlag(ENDY, ENDYLONG, MSyntax::kString);
+		syntax.addFlag(ENDZ, ENDZLONG, MSyntax::kString);
 		return syntax;
 	}
 

@@ -14,7 +14,13 @@ LSystemCmd::~LSystemCmd()
 MStatus LSystemCmd::doIt( const MArgList& args )
 {
 
-	double branchStartX;
+	MString branchStartX;
+	MString branchStartY;
+	MString branchStartZ;
+	MString branchEndX;
+	MString branchEndY;
+	MString branchEndZ;
+
 	// message in Maya output window
     cout<<"Implement Me!"<<endl;
 	std::cout.flush();
@@ -31,10 +37,36 @@ MStatus LSystemCmd::doIt( const MArgList& args )
 	{
 		parser.getFlagArgument(STARTX, 0, branchStartX);
 	}
+	if (parser.isFlagSet(STARTY))
+	{
+		parser.getFlagArgument(STARTY, 0, branchStartY);
+	}
+	if (parser.isFlagSet(STARTZ))
+	{
+		parser.getFlagArgument(STARTZ, 0, branchStartZ);
+	}
+	if (parser.isFlagSet(ENDX))
+	{
+		parser.getFlagArgument(ENDX, 0, branchEndX);
+	}
+	if (parser.isFlagSet(ENDY))
+	{
+		parser.getFlagArgument(ENDY, 0, branchEndY);
+	}
+	if (parser.isFlagSet(ENDZ))
+	{
+		parser.getFlagArgument(ENDZ, 0, branchEndZ);
+	}
 
-	// message in scriptor editor
-	MGlobal::displayInfo("Implement Me!");
+	MString command = "circle - centerX 0 - centerY 0 - centerZ 0 - name nurbsCircle1 - radius 2; \ncurve -d 1 -p " + branchStartX + " " + branchStartY + " " + branchStartZ + " - p "
+		+ branchEndX + " " + branchEndY + " " + branchEndZ + " -k 0 - k 1 - name curve1;" 
+		+ "\nselect - r nurbsCircle1 curve1 ;" 
+		+ "\nextrude - ch true - rn false - po 1 - et 2 - ucp 1 - fpt 1 - upn 1 - rotation 0 - scale 1 - rsp 1 \"nurbsCircle1\" \"curve1\";";
 
-    return MStatus::kSuccess;
+	status = MGlobal::executeCommand(command);
+	MGlobal::displayInfo("LSystemCmd\n");
+	setResult("LSystemCmd was executed\n");
+
+	return status;
 }
 
