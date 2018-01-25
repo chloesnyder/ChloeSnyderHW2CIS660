@@ -19,6 +19,15 @@
 #define ENDYLONG "-endy"
 #define ENDZLONG "-endz"
 
+#define STEPSIZE "-ss"
+#define STEPSIZELONG "-step"
+#define ANGLE "-a"
+#define ANGLELONG "-angle"
+#define GRAMMAR "-g"
+#define GRAMMARLONG "-grammar"
+#define ITER "-i"
+#define ITERLONG "-iter"
+
 class LSystemCmd : public MPxCommand
 {
 public:
@@ -31,6 +40,10 @@ public:
 		syntax.addFlag(ENDX, ENDXLONG, MSyntax::kString);
 		syntax.addFlag(ENDY, ENDYLONG, MSyntax::kString);
 		syntax.addFlag(ENDZ, ENDZLONG, MSyntax::kString);
+		syntax.addFlag(STEPSIZE, STEPSIZELONG, MSyntax::kDouble);
+		syntax.addFlag(ANGLE, ANGLELONG, MSyntax::kDouble);
+		syntax.addFlag(GRAMMAR, GRAMMARLONG, MSyntax::kString);
+		syntax.addFlag(ITER, ITERLONG, MSyntax::kLong);
 		return syntax;
 	}
 

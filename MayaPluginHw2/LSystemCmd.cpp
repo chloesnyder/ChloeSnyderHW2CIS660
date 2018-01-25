@@ -21,9 +21,11 @@ MStatus LSystemCmd::doIt( const MArgList& args )
 	MString branchEndY;
 	MString branchEndZ;
 
-	// message in Maya output window
-    cout<<"Implement Me!"<<endl;
-	std::cout.flush();
+	double stepSize;
+	double angle;
+	MString grammar;
+	int numIter;
+
 
 	MStatus status;
 
