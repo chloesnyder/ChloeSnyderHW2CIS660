@@ -32,6 +32,11 @@ MStatus initializePlugin( MObject obj )
         return status;
     }
 
+	char buffer[2048];
+	//sprintf_s(buffer, 2048, "source \"%s/MyPluginDialog\";", plugin.loadPath());
+	//sprintf_s(buffer, 2048, "..\"%s/MyPluginDialog\";", plugin.loadPath());
+	MGlobal::executeCommand(buffer, true);
+
     return status;
 }
 

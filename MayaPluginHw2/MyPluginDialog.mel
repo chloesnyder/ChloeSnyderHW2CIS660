@@ -1,0 +1,23 @@
+{
+global string $iter = 0;
+
+global proc iterValueChanged() {
+	global string $iter;
+
+	$value = `intSliderGrp -query -value $iter`;
+}
+
+
+
+    window;
+columnLayout;
+    button -command "fileDialog -dm \"..\C:\Users\SIG\Documents\GitHub\ChloeSnyderHW2CIS660\MayaPluginHw2\plants\"" -label "Browse for grammar file";;
+    scrollField;
+    $iter = `intSliderGrp -minValue 1 -step 1 -changeCommand "iterValueChanged();" -label "Iterations" -field true`;
+    button -command ("LSystemCmd -sx "+$iter+" -sy "+$iter+" -sz  "+$iter+" -ex 3 -ey 3 -ez 3") -label "OK";
+showWindow;;
+};
+
+
+   // string $step = `floatSliderGrp -label "Default step size" -field true`;
+    //string $ang = `floatSliderGrp -minValue -360 -maxValue 360 -label "Default angle" -field true`;
