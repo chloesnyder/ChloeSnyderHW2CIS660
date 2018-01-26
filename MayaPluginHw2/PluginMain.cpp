@@ -18,6 +18,7 @@
 #include <list>
 
 #include "LSystemCmd.h"
+#include "LSystemNode.h"
 
 
 MStatus initializePlugin( MObject obj )
@@ -28,19 +29,20 @@ MStatus initializePlugin( MObject obj )
     // Register Command
     status = plugin.registerCommand( "LSystemCmd", LSystemCmd::creator, LSystemCmd::newSyntax );
     if (!status) {
-        status.perror("registerCommand");
+        status.perror("registerCommand LSystemCmd");
         return status;
     }
 
-	char buffer[2048];
-	//sprintf_s(buffer, 2048, "source \"%s/MyPluginDialog\";", plugin.loadPath());
-	/*LSystemNode::path = plugin.loadPath();
+	status = plugin.registerCommand("LSystemNode", LSystemNode::creator);
+	if (!status) {
+		status.perror("registerCommand LSystemNode");
+		return status;
+	}
+
 	char buffer[2048];
 	MString s = plugin.loadPath();
-	sprintf_s(buffer, 2048, "source \"%s/LSystemCmd.mel\";", s.asChar());
-	MGlobal::executeCommand(buffer, true);*/
-	MString s = plugin.loadPath();
-	sprintf_s(buffer, 2048, "source \"%s/MyPluginDialog.mel\";", s.asChar());
+	LSystemNode::path = plugin.loadPath();
+		sprintf_s(buffer, 2048, "source \"%s/LSystemCmd.mel\";", s.asChar());
 	MGlobal::executeCommand(buffer, true);
 
     return status;
@@ -53,9 +55,15 @@ MStatus uninitializePlugin( MObject obj)
 
     status = plugin.deregisterCommand( "LSystemCmd" );
     if (!status) {
-	    status.perror("deregisterCommand");
+	    status.perror("deregisterCommand LSystemCmd");
 	    return status;
     }
+
+	status = plugin.deregisterCommand("LSystemNode");
+	if (!status) {
+		status.perror("deregisterCommand LSystemNode");
+		return status;
+	}
 
     return status;
 }

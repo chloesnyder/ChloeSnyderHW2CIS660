@@ -389,6 +389,7 @@
     <ClCompile Include="cylinder.cpp" />
     <ClCompile Include="LSystem.cpp" />
     <ClCompile Include="LSystemCmd.cpp" />
+    <ClCompile Include="LSystemNode.cpp" />
     <ClCompile Include="PluginMain.cpp" />
     <ClCompile Include="vec.cpp" />
   </ItemGroup>
@@ -396,6 +397,7 @@
     <ClInclude Include="cylinder.h" />
     <ClInclude Include="LSystem.h" />
     <ClInclude Include="LSystemCmd.h" />
+    <ClInclude Include="LSystemNode.h" />
     <ClInclude Include="matrix.h" />
     <ClInclude Include="vec.h" />
   </ItemGroup>

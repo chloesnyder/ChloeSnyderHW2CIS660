@@ -1,0 +1,40 @@
+global string $iter = 0;
+global int $valIter = 0;
+
+global string $step = 0;
+global float $valStep = 0;
+
+global string $ang = 0;
+global float $valAng = 0;
+
+global proc iterValueChanged() {
+	global string $iter;
+	global int $valIter;
+
+	$valIter = `intSliderGrp -query -value $iter`;
+}
+
+global proc stepValueChanged() {
+	global string $step;
+	global float $valStep;
+
+	$valStep = `floatSliderGrp -query -value $step`;
+}
+
+global proc angValueChanged() {
+	global string $ang;
+	global float $valAng;
+
+	$valAng = `floatSliderGrp -query -value $ang`;
+}
+
+
+    window;
+columnLayout;
+    button -command "fileDialog -dm \"..\C:\Users\SIG\Documents\GitHub\ChloeSnyderHW2CIS660\MayaPluginHw2\plants\"" -label "Browse for grammar file";;
+    scrollField;
+    $iter = `intSliderGrp -minValue 1 -step 1 -changeCommand "iterValueChanged();" -label "Iterations" -field true`;
+    $step = `floatSliderGrp -changeCommand "stepValueChanged();" -label "Default step size" -field true`;
+    $ang = `floatSliderGrp -minValue -360 -maxValue 360 -changeCommand "angValueChanged();" -label "Default angle" -field true`;
+    button -command ("LSystemCmd -sx "+$valIter+" -sy "+$valStep+" -sz  "+$valAng+" -ex 3 -ey 3 -ez 3") -label "OK";
+showWindow;
