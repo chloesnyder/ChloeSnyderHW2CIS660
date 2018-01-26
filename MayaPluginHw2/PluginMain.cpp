@@ -34,6 +34,7 @@ MStatus initializePlugin( MObject obj )
     }
 
 	status = plugin.registerCommand("LSystemNode", LSystemNode::creator);
+	//	status = plugin.registerCommand("LSystemNode", LSystemNode::id, LSystemNode::creator, LSystemNode::initialize);
 	if (!status) {
 		status.perror("registerCommand LSystemNode");
 		return status;

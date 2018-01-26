@@ -3,8 +3,10 @@
 #include <maya/MFnNumericAttribute.h>
 #include <maya/MFnTypedAttribute.h>
 #include <maya/MFnUnitAttribute.h>
-
+#include <maya/MFnMeshData.h>
+#include <maya/MFnMesh.h>
 #include <maya/MTime.h>
+#include "cylinder.h"
 
 
 #define McheckErr(stat,msg)             \
@@ -19,7 +21,7 @@ class LSystemNode :
 public:
 	LSystemNode() {};
 	virtual ~LSystemNode() {};
-	//virtual MStatus compute(const MPlug& plug, MDataBlock& data);
+	virtual MStatus compute(const MPlug& plug, MDataBlock& data);
 	static void* creator();
 	static MStatus initialize();
 
@@ -31,6 +33,9 @@ public:
 	static MObject outputGeometry;
 
 	static MString path;
+
+protected:
+	MObject createMesh(const MTime& time, MObject& outData, MStatus& stat);
 
 
 };
