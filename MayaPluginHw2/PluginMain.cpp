@@ -34,7 +34,13 @@ MStatus initializePlugin( MObject obj )
 
 	char buffer[2048];
 	//sprintf_s(buffer, 2048, "source \"%s/MyPluginDialog\";", plugin.loadPath());
-	//sprintf_s(buffer, 2048, "..\"%s/MyPluginDialog\";", plugin.loadPath());
+	/*LSystemNode::path = plugin.loadPath();
+	char buffer[2048];
+	MString s = plugin.loadPath();
+	sprintf_s(buffer, 2048, "source \"%s/LSystemCmd.mel\";", s.asChar());
+	MGlobal::executeCommand(buffer, true);*/
+	MString s = plugin.loadPath();
+	sprintf_s(buffer, 2048, "source \"%s/MyPluginDialog.mel\";", s.asChar());
 	MGlobal::executeCommand(buffer, true);
 
     return status;
