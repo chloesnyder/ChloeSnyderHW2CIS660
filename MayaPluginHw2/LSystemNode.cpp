@@ -27,7 +27,7 @@
 
 //virtual MStatus compute(const MPlug& plug, MDataBlock& data);
 MObject LSystemNode::time;
-MTypeId LSystemNode::id(0x80000);
+MTypeId LSystemNode::id(0x0);
 MObject LSystemNode::angle;
 MObject LSystemNode::step_size;
 MObject LSystemNode::grammarFile;
@@ -59,34 +59,34 @@ MStatus LSystemNode::initialize()
 		MFnUnitAttribute::kTime,
 		0.0, &returnStatus);
 	McheckErr(returnStatus, "ERROR creating LSystemNode time attribute\n");
-	//CHECK_MSTATUS(unitAttr.setKeyable(true));
+	CHECK_MSTATUS(unitAttr.setKeyable(true));
 	CHECK_MSTATUS(unitAttr.setStorable(true));
-	//CHECK_MSTATUS(unitAttr.setReadable(true));
-	//CHECK_MSTATUS(unitAttr.setWritable(true));
+	CHECK_MSTATUS(unitAttr.setReadable(true));
+	CHECK_MSTATUS(unitAttr.setWritable(true));
 
 	LSystemNode::angle = numAttr.MFnNumericAttribute::create("angle",
 		"a",
-		MFnNumericData::kFloat,
+		MFnNumericData::kDouble,
 		0.0,
 		&returnStatus
 	);
 	McheckErr(returnStatus, "ERROR creating LSystemNode angle attribute\n");
-	//CHECK_MSTATUS(numAttr.setKeyable(true));
+	CHECK_MSTATUS(numAttr.setKeyable(true));
 	CHECK_MSTATUS(numAttr.setStorable(true));
-	//CHECK_MSTATUS(numAttr.setReadable(true));
-	//CHECK_MSTATUS(numAttr.setWritable(true));
+	CHECK_MSTATUS(numAttr.setReadable(true));
+	CHECK_MSTATUS(numAttr.setWritable(true));
 
 	LSystemNode::step_size = numAttr.MFnNumericAttribute::create("step",
 		"ss",
-		MFnNumericData::kFloat,
+		MFnNumericData::kDouble,
 		0.0,
 		&returnStatus
 	);
 	McheckErr(returnStatus, "ERROR creating LSystemNode step attribute\n");
-	//CHECK_MSTATUS(numAttr.setKeyable(true));
+	CHECK_MSTATUS(numAttr.setKeyable(true));
 	CHECK_MSTATUS(numAttr.setStorable(true));
-	//CHECK_MSTATUS(numAttr.setReadable(true));
-	//CHECK_MSTATUS(numAttr.setWritable(true));
+	CHECK_MSTATUS(numAttr.setReadable(true));
+	CHECK_MSTATUS(numAttr.setWritable(true));
 
 
 	LSystemNode::grammarFile = typedAttr.MFnTypedAttribute::create("grammar",
@@ -100,13 +100,13 @@ MStatus LSystemNode::initialize()
 	CHECK_MSTATUS(typedAttr.setReadable(true));
 	CHECK_MSTATUS(typedAttr.setWritable(true));
 
-	LSystemNode::outputMesh = typedAttr.create("outputGeometry", "out",
+	LSystemNode::outputMesh = typedAttr.create("outputMesh", "out",
 		MFnData::kMesh,
 		&returnStatus);
 	McheckErr(returnStatus, "ERROR creating LSystemNode output attribute\n");
-	//CHECK_MSTATUS(typedAttr.setKeyable(false));
-	CHECK_MSTATUS(typedAttr.setStorable(true));
-	//CHECK_MSTATUS(typedAttr.setReadable(true));
+	CHECK_MSTATUS(typedAttr.setKeyable(false));
+	CHECK_MSTATUS(typedAttr.setStorable(false));
+	CHECK_MSTATUS(typedAttr.setReadable(true));
 	CHECK_MSTATUS(typedAttr.setWritable(false));
 
 
@@ -152,18 +152,17 @@ MStatus LSystemNode::compute(const MPlug& plug, MDataBlock& data)
 		// get angle
 		MDataHandle angleData = data.inputValue(angle, &returnStatus);
 		McheckErr(returnStatus, "Error getting angle data handle\n");
-		float angleVal = angleData.asFloat();
+		double angleVal = angleData.asDouble();
 
 		// get step size
 		MDataHandle stepData = data.inputValue(step_size, &returnStatus);
 		McheckErr(returnStatus, "Error getting step data handle\n");
-		float stepVal = stepData.asFloat();
+		double stepVal = stepData.asDouble();
 
 		// get grammar
 		MDataHandle grammarData = data.inputValue(grammarFile, &returnStatus);
 		McheckErr(returnStatus, "Error getting gramnar data handle\n");
 		MString gramVal = grammarData.asString();
-
 
 		// get output object
 		MDataHandle outputHandle = data.outputValue(outputMesh, &returnStatus);

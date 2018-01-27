@@ -35,7 +35,7 @@ MStatus initializePlugin(MObject obj)
 	}
 
 	plugin.setName("LSystem");
-
+	
 	status = plugin.registerNode("LSystemNode", LSystemNode::id, LSystemNode::creator, LSystemNode::initialize);
 	if (!status) {
 		CHECK_MSTATUS_AND_RETURN_IT(status);
