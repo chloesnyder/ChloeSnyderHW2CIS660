@@ -8,7 +8,8 @@ global string $ang = 0;
 global float $valAng = 0;
 
 global string $grammarPath = 0;
-global string $valGram = 0;
+global string $grammar = 0;
+global string $grammarScroll = 0;
 
 global proc iterValueChanged() {
 	global string $iter;
@@ -31,6 +32,19 @@ global proc angValueChanged() {
 	$valAng = `floatSliderGrp -query -value $ang`;
 }
 
+global proc fileDialog()
+{
+	global string $grammarPath;
+	global string $grammar;
+	global string $grammarScroll;
+
+
+	$grammarPath = `fileDialog -dm "*.txt"`;
+	$file = `fopen $grammarPath "r"`;
+    $grammar = `fread $file $grammar`;
+    scrollField -edit -text $grammar $grammarScroll;
+    fclose $file;
+}
 
 global proc createNode() {
 	createNode transform -n LSystem1;
@@ -45,10 +59,12 @@ global proc createNode() {
 
     window;
 columnLayout;
-    button -command "fileDialog -dm \"..\C:\Users\SIG\Documents\GitHub\ChloeSnyderHW2CIS660\MayaPluginHw2\plants\"" -label "Browse for grammar file";;
-    scrollField;
+    button -command fileDialog -label "Browse for grammar file";;
+    $grammarScroll = `scrollField -wordWrap on -text "Grammar"`;
+    //scrollField;
     $iter = `intSliderGrp -minValue 1 -step 1 -changeCommand "iterValueChanged();" -label "Iterations" -field true`;
     $step = `floatSliderGrp -changeCommand "stepValueChanged();" -label "Default step size" -field true`;
     $ang = `floatSliderGrp -minValue -360 -maxValue 360 -changeCommand "angValueChanged();" -label "Default angle" -field true`;
-    button -command ("LSystemCmd -i "+$valIter+" -ss "+$valStep+" -a  "+$valAng+"" + " -g " + $valGram+"") -label "OK";
+    button -command ("LSystemCmd -i "+$valIter+" -ss "+$valStep+" -a  "+$valAng+"" + " -g " + $grammar+"") -label "Call LSystem Command";
+    button -label "Create LSystem Node" -command createNode;
 showWindow;

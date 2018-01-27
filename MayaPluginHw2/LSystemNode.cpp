@@ -31,7 +31,7 @@ MTypeId LSystemNode::id(0x80000);
 MObject LSystemNode::angle;
 MObject LSystemNode::step_size;
 MObject LSystemNode::grammarFile;
-MObject LSystemNode::outputGeometry;
+MObject LSystemNode::outputMesh;
 MString LSystemNode::path;
 
 void* LSystemNode::creator()
@@ -59,10 +59,10 @@ MStatus LSystemNode::initialize()
 		MFnUnitAttribute::kTime,
 		0.0, &returnStatus);
 	McheckErr(returnStatus, "ERROR creating LSystemNode time attribute\n");
-	CHECK_MSTATUS(unitAttr.setKeyable(true));
+	//CHECK_MSTATUS(unitAttr.setKeyable(true));
 	CHECK_MSTATUS(unitAttr.setStorable(true));
-	CHECK_MSTATUS(unitAttr.setReadable(true));
-	CHECK_MSTATUS(unitAttr.setWritable(true));
+	//CHECK_MSTATUS(unitAttr.setReadable(true));
+	//CHECK_MSTATUS(unitAttr.setWritable(true));
 
 	LSystemNode::angle = numAttr.MFnNumericAttribute::create("angle",
 		"a",
@@ -71,10 +71,10 @@ MStatus LSystemNode::initialize()
 		&returnStatus
 	);
 	McheckErr(returnStatus, "ERROR creating LSystemNode angle attribute\n");
-	CHECK_MSTATUS(numAttr.setKeyable(true));
+	//CHECK_MSTATUS(numAttr.setKeyable(true));
 	CHECK_MSTATUS(numAttr.setStorable(true));
-	CHECK_MSTATUS(numAttr.setReadable(true));
-	CHECK_MSTATUS(numAttr.setWritable(true));
+	//CHECK_MSTATUS(numAttr.setReadable(true));
+	//CHECK_MSTATUS(numAttr.setWritable(true));
 
 	LSystemNode::step_size = numAttr.MFnNumericAttribute::create("step",
 		"ss",
@@ -83,10 +83,10 @@ MStatus LSystemNode::initialize()
 		&returnStatus
 	);
 	McheckErr(returnStatus, "ERROR creating LSystemNode step attribute\n");
-	CHECK_MSTATUS(numAttr.setKeyable(true));
+	//CHECK_MSTATUS(numAttr.setKeyable(true));
 	CHECK_MSTATUS(numAttr.setStorable(true));
-	CHECK_MSTATUS(numAttr.setReadable(true));
-	CHECK_MSTATUS(numAttr.setWritable(true));
+	//CHECK_MSTATUS(numAttr.setReadable(true));
+	//CHECK_MSTATUS(numAttr.setWritable(true));
 
 
 	LSystemNode::grammarFile = typedAttr.MFnTypedAttribute::create("grammar",
@@ -100,13 +100,13 @@ MStatus LSystemNode::initialize()
 	CHECK_MSTATUS(typedAttr.setReadable(true));
 	CHECK_MSTATUS(typedAttr.setWritable(true));
 
-	LSystemNode::outputGeometry = typedAttr.create("outputGeometry", "out",
+	LSystemNode::outputMesh = typedAttr.create("outputGeometry", "out",
 		MFnData::kMesh,
 		&returnStatus);
 	McheckErr(returnStatus, "ERROR creating LSystemNode output attribute\n");
-	CHECK_MSTATUS(typedAttr.setKeyable(false));
-	CHECK_MSTATUS(typedAttr.setStorable(false));
-	CHECK_MSTATUS(typedAttr.setReadable(true));
+	//CHECK_MSTATUS(typedAttr.setKeyable(false));
+	CHECK_MSTATUS(typedAttr.setStorable(true));
+	//CHECK_MSTATUS(typedAttr.setReadable(true));
 	CHECK_MSTATUS(typedAttr.setWritable(false));
 
 
@@ -118,16 +118,16 @@ MStatus LSystemNode::initialize()
 	McheckErr(returnStatus, "ERROR adding step attribute\n");
 	returnStatus = addAttribute(LSystemNode::grammarFile);
 	McheckErr(returnStatus, "ERROR adding grammar attribute\n");
-	returnStatus = addAttribute(LSystemNode::outputGeometry);
+	returnStatus = addAttribute(LSystemNode::outputMesh);
 	McheckErr(returnStatus, "ERROR adding output attribute\n");
 
-	returnStatus = attributeAffects(LSystemNode::grammarFile, LSystemNode::outputGeometry); // do I need this?
+	returnStatus = attributeAffects(LSystemNode::grammarFile, LSystemNode::outputMesh); 
 	McheckErr(returnStatus, "ERROR in attributeAffects\n");
-	returnStatus = attributeAffects(LSystemNode::angle, LSystemNode::outputGeometry); // do I need this?
+	returnStatus = attributeAffects(LSystemNode::angle, LSystemNode::outputMesh); 
 	McheckErr(returnStatus, "ERROR in attributeAffects\n");
-	returnStatus = attributeAffects(LSystemNode::step_size, LSystemNode::outputGeometry); // do I need this?
+	returnStatus = attributeAffects(LSystemNode::step_size, LSystemNode::outputMesh); 
 	McheckErr(returnStatus, "ERROR in attributeAffects\n");
-	returnStatus = attributeAffects(LSystemNode::time, LSystemNode::outputGeometry); // do I need this?
+	returnStatus = attributeAffects(LSystemNode::time, LSystemNode::outputMesh); 
 	McheckErr(returnStatus, "ERROR in attributeAffects\n");
 
 	return MS::kSuccess;
@@ -142,7 +142,7 @@ MStatus LSystemNode::initialize()
 MStatus LSystemNode::compute(const MPlug& plug, MDataBlock& data)
 {
 	MStatus returnStatus;
-	if (plug == outputGeometry)
+	if (plug == outputMesh)
 	{
 		// get time
 		MDataHandle timeData = data.inputValue(time, &returnStatus);
@@ -166,7 +166,7 @@ MStatus LSystemNode::compute(const MPlug& plug, MDataBlock& data)
 
 
 		// get output object
-		MDataHandle outputHandle = data.outputValue(outputGeometry, &returnStatus);
+		MDataHandle outputHandle = data.outputValue(outputMesh, &returnStatus);
 		McheckErr(returnStatus, "ERROR getting geometry data handle\n");
 
 		MFnMeshData dataCreator;

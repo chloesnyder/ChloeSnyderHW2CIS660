@@ -24,7 +24,7 @@ public:
 	static MObject angle;
 	static MObject step_size;
 	static MObject grammarFile;
-	static MObject outputGeometry;
+	static MObject outputMesh;
 
 	static MString path;
 

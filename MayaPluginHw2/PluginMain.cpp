@@ -38,8 +38,7 @@ MStatus initializePlugin(MObject obj)
 
 	status = plugin.registerNode("LSystemNode", LSystemNode::id, LSystemNode::creator, LSystemNode::initialize);
 	if (!status) {
-		status.perror("registerCommand LSystemNode");
-		return status;
+		CHECK_MSTATUS_AND_RETURN_IT(status);
 	}
 
 	char buffer[2048];
@@ -62,10 +61,9 @@ MStatus uninitializePlugin(MObject obj)
 		return status;
 	}
 
-	status = plugin.deregisterCommand("LSystemNode");
+	status = plugin.deregisterNode(LSystemNode::id);
 	if (!status) {
-		status.perror("deregisterCommand LSystemNode");
-		return status;
+		CHECK_MSTATUS_AND_RETURN_IT(status);
 	}
 
 	return status;
