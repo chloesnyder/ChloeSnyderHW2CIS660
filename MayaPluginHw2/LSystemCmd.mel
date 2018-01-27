@@ -7,6 +7,9 @@ global float $valStep = 0;
 global string $ang = 0;
 global float $valAng = 0;
 
+global string $grammarPath = 0;
+global string $valGram = 0;
+
 global proc iterValueChanged() {
 	global string $iter;
 	global int $valIter;
@@ -29,6 +32,17 @@ global proc angValueChanged() {
 }
 
 
+global proc createNode() {
+	createNode transform -n LSystem1;
+	createNode mesh -n LSystemShape1 -p LSystem1;
+	sets -add initialShadingGroup LSystemShape1;
+	createNode LSystemNode -n LSystemNode1;
+	connectAttr time1.outTime LSystemNode1.time;
+	connectAttr LSystemNode1.outputMesh LSystemShape1.inMesh;
+
+}
+
+
     window;
 columnLayout;
     button -command "fileDialog -dm \"..\C:\Users\SIG\Documents\GitHub\ChloeSnyderHW2CIS660\MayaPluginHw2\plants\"" -label "Browse for grammar file";;
@@ -36,5 +50,5 @@ columnLayout;
     $iter = `intSliderGrp -minValue 1 -step 1 -changeCommand "iterValueChanged();" -label "Iterations" -field true`;
     $step = `floatSliderGrp -changeCommand "stepValueChanged();" -label "Default step size" -field true`;
     $ang = `floatSliderGrp -minValue -360 -maxValue 360 -changeCommand "angValueChanged();" -label "Default angle" -field true`;
-    button -command ("LSystemCmd -sx "+$valIter+" -sy "+$valStep+" -sz  "+$valAng+" -ex 3 -ey 3 -ez 3") -label "OK";
+    button -command ("LSystemCmd -i "+$valIter+" -ss "+$valStep+" -a  "+$valAng+"" + " -g " + $valGram+"") -label "OK";
 showWindow;

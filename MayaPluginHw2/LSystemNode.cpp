@@ -1,10 +1,35 @@
+#define MNoVersionString
+#define MNoPluginEntry
+
 #include "LSystemNode.h"
+#include "cylinder.h"
+#include "LSystem.h"
+
+#include <maya/MFnPlugin.h>
+#include <maya/MTime.h>
+#include <maya/MFnMesh.h>
+#include <maya/MPoint.h>
+#include <maya/MFloatPoint.h>
+#include <maya/MFloatPointArray.h>
+#include <maya/MIntArray.h>
+#include <maya/MDoubleArray.h>
+
+#include <maya/MFnUnitAttribute.h>
+#include <maya/MFnTypedAttribute.h>
+#include <maya/MFnNumericAttribute.h>
+
+#include <maya/MObject.h>
+#include <maya/MPlug.h>
+#include <maya/MDataBlock.h>
+#include <maya/MFnMeshData.h>
+#include <maya/MIOStream.h>
+
 
 //virtual MStatus compute(const MPlug& plug, MDataBlock& data);
 MObject LSystemNode::time;
 MTypeId LSystemNode::id(0x80000);
-MObject LSystemNode::defaultAngle;
-MObject LSystemNode::defaultStepSize;
+MObject LSystemNode::angle;
+MObject LSystemNode::step_size;
 MObject LSystemNode::grammarFile;
 MObject LSystemNode::outputGeometry;
 MString LSystemNode::path;
@@ -23,6 +48,7 @@ void* LSystemNode::creator()
 MStatus LSystemNode::initialize()
 {
 
+
 	MFnUnitAttribute unitAttr;
 	MFnTypedAttribute typedAttr;
 	MFnNumericAttribute numAttr;
@@ -33,22 +59,35 @@ MStatus LSystemNode::initialize()
 		MFnUnitAttribute::kTime,
 		0.0, &returnStatus);
 	McheckErr(returnStatus, "ERROR creating LSystemNode time attribute\n");
+	CHECK_MSTATUS(unitAttr.setKeyable(true));
+	CHECK_MSTATUS(unitAttr.setStorable(true));
+	CHECK_MSTATUS(unitAttr.setReadable(true));
+	CHECK_MSTATUS(unitAttr.setWritable(true));
 
-	LSystemNode::defaultAngle = numAttr.MFnNumericAttribute::create("angle",
+	LSystemNode::angle = numAttr.MFnNumericAttribute::create("angle",
 		"a",
 		MFnNumericData::kFloat,
 		0.0,
 		&returnStatus
 	);
 	McheckErr(returnStatus, "ERROR creating LSystemNode angle attribute\n");
+	CHECK_MSTATUS(numAttr.setKeyable(true));
+	CHECK_MSTATUS(numAttr.setStorable(true));
+	CHECK_MSTATUS(numAttr.setReadable(true));
+	CHECK_MSTATUS(numAttr.setWritable(true));
 
-	LSystemNode::defaultStepSize = numAttr.MFnNumericAttribute::create("step",
+	LSystemNode::step_size = numAttr.MFnNumericAttribute::create("step",
 		"ss",
 		MFnNumericData::kFloat,
 		0.0,
 		&returnStatus
 	);
 	McheckErr(returnStatus, "ERROR creating LSystemNode step attribute\n");
+	CHECK_MSTATUS(numAttr.setKeyable(true));
+	CHECK_MSTATUS(numAttr.setStorable(true));
+	CHECK_MSTATUS(numAttr.setReadable(true));
+	CHECK_MSTATUS(numAttr.setWritable(true));
+
 
 	LSystemNode::grammarFile = typedAttr.MFnTypedAttribute::create("grammar",
 		"g",
@@ -56,20 +95,26 @@ MStatus LSystemNode::initialize()
 		&returnStatus
 	);
 	McheckErr(returnStatus, "ERROR creating LSystemNode grammar attribute\n");
+	CHECK_MSTATUS(typedAttr.setKeyable(true));
+	CHECK_MSTATUS(typedAttr.setStorable(true));
+	CHECK_MSTATUS(typedAttr.setReadable(true));
+	CHECK_MSTATUS(typedAttr.setWritable(true));
 
 	LSystemNode::outputGeometry = typedAttr.create("outputGeometry", "out",
 		MFnData::kMesh,
 		&returnStatus);
 	McheckErr(returnStatus, "ERROR creating LSystemNode output attribute\n");
+	CHECK_MSTATUS(typedAttr.setKeyable(false));
+	CHECK_MSTATUS(typedAttr.setStorable(false));
+	CHECK_MSTATUS(typedAttr.setReadable(true));
+	CHECK_MSTATUS(typedAttr.setWritable(false));
 
-	typedAttr.setStorable(false);
-	//numAttr.setStorable(true); // do I need this?
 
 	returnStatus = addAttribute(LSystemNode::time);
 	McheckErr(returnStatus, "ERROR adding time attribute\n");
-	returnStatus = addAttribute(LSystemNode::defaultAngle);
+	returnStatus = addAttribute(LSystemNode::angle);
 	McheckErr(returnStatus, "ERROR adding angle attribute\n");
-	returnStatus = addAttribute(LSystemNode::defaultStepSize);
+	returnStatus = addAttribute(LSystemNode::step_size);
 	McheckErr(returnStatus, "ERROR adding step attribute\n");
 	returnStatus = addAttribute(LSystemNode::grammarFile);
 	McheckErr(returnStatus, "ERROR adding grammar attribute\n");
@@ -78,9 +123,9 @@ MStatus LSystemNode::initialize()
 
 	returnStatus = attributeAffects(LSystemNode::grammarFile, LSystemNode::outputGeometry); // do I need this?
 	McheckErr(returnStatus, "ERROR in attributeAffects\n");
-	returnStatus = attributeAffects(LSystemNode::defaultAngle, LSystemNode::outputGeometry); // do I need this?
+	returnStatus = attributeAffects(LSystemNode::angle, LSystemNode::outputGeometry); // do I need this?
 	McheckErr(returnStatus, "ERROR in attributeAffects\n");
-	returnStatus = attributeAffects(LSystemNode::defaultStepSize, LSystemNode::outputGeometry); // do I need this?
+	returnStatus = attributeAffects(LSystemNode::step_size, LSystemNode::outputGeometry); // do I need this?
 	McheckErr(returnStatus, "ERROR in attributeAffects\n");
 	returnStatus = attributeAffects(LSystemNode::time, LSystemNode::outputGeometry); // do I need this?
 	McheckErr(returnStatus, "ERROR in attributeAffects\n");
@@ -92,7 +137,8 @@ MStatus LSystemNode::initialize()
 // This function should i) get called whenever an attribute, such as time, changes,
 // and ii) then recompute the output mesh. We have included a utility class for creating 
 // cylinders which you may use to help create the mesh geometry.
-// Don’t forget to connect all the input attributes to the geometry! Test that changing every attribute from the attribute panel works correctly!
+// Don’t forget to connect all the input attributes to the geometry! Test that changing every attribute from the attribute panel works correctly!
+
 MStatus LSystemNode::compute(const MPlug& plug, MDataBlock& data)
 {
 	MStatus returnStatus;
@@ -101,24 +147,24 @@ MStatus LSystemNode::compute(const MPlug& plug, MDataBlock& data)
 		// get time
 		MDataHandle timeData = data.inputValue(time, &returnStatus);
 		McheckErr(returnStatus, "Error getting time data handle\n");
-		MTime time = timeData.asTime();
+		MTime timeVal = timeData.asTime();
 
 		// get angle
-		MDataHandle angleData = data.inputValue(defaultAngle, &returnStatus);
+		MDataHandle angleData = data.inputValue(angle, &returnStatus);
 		McheckErr(returnStatus, "Error getting angle data handle\n");
-		float angle = angleData.asFloat();
+		float angleVal = angleData.asFloat();
 
-		// get angle
-		MDataHandle stepData = data.inputValue(defaultStepSize, &returnStatus);
+		// get step size
+		MDataHandle stepData = data.inputValue(step_size, &returnStatus);
 		McheckErr(returnStatus, "Error getting step data handle\n");
-		float step = stepData.asFloat();
+		float stepVal = stepData.asFloat();
 
 		// get grammar
 		MDataHandle grammarData = data.inputValue(grammarFile, &returnStatus);
 		McheckErr(returnStatus, "Error getting gramnar data handle\n");
-		MString gram = grammarData.asString();
+		MString gramVal = grammarData.asString();
 
-		
+
 		// get output object
 		MDataHandle outputHandle = data.outputValue(outputGeometry, &returnStatus);
 		McheckErr(returnStatus, "ERROR getting geometry data handle\n");
@@ -127,24 +173,60 @@ MStatus LSystemNode::compute(const MPlug& plug, MDataBlock& data)
 		MObject newOutputData = dataCreator.create(&returnStatus);
 		McheckErr(returnStatus, "ERROR creating outputData");
 
+		createMesh(timeVal, angleVal, stepVal, gramVal, newOutputData, returnStatus);
+		McheckErr(returnStatus, "ERROR creating mesh");
+
+		outputHandle.set(newOutputData);
+		data.setClean(plug);
+
+	}
+	else {
+		return MS::kUnknownParameter;
 	}
 }
 
-MObject LSystemNode::createMesh(const MTime& time, MObject& outData, MStatus& stat)
+MObject LSystemNode::createMesh(const MTime& time, const float& angle, const float &step, const MString& grammar, MObject& outData, MStatus& stat)
 {
 	MFnMesh meshFS;
-	MPoint start = MPoint();
-	MPoint end = MPoint(0, 1, 0);
-	CylinderMesh cm = CylinderMesh(start, end);
-
 	MPointArray points;
 	MIntArray faceCounts;
 	MIntArray faceConnects;
+	MPoint start;
+	MPoint end;
 
-	 cm.getMesh(points, faceCounts, faceConnects);
 
-	 int numVertices = points.length();
-	 int numFaces = faceCounts.length();
+	int t = (int)time.as(MTime::kFilm);
+	MObject plugObj = MFnPlugin::findPlugin("LSystem");
+	MFnPlugin plugin(plugObj);
+	MString grammarFilePath = plugin.loadPath() + "/" + grammar;
+
+	LSystem lsystem;
+	// load grammar file that user selects, set default angle and step size
+	lsystem.loadProgram(grammarFilePath.asChar());
+	lsystem.setDefaultAngle(angle);
+	lsystem.setDefaultStep(step);
+	// vector to store all branches processed at each iteration of lsystem
+	std::vector<LSystem::Branch> b;
+
+	for (int i = 0; i < t; i++)
+	{
+		std::string currIter = lsystem.getIteration(i);
+		lsystem.process(i, b);
+	}
+
+	// Create mesh after final iteration
+	for (int i = 0; i < b.size(); i++)
+	{
+		vec3 s = b.at(i).first;
+		vec3 e = b.at(i).second;
+		start = MPoint(s[0], s[1], s[2]);
+		end = MPoint(e[0], e[1], e[2]);
+		CylinderMesh cm = CylinderMesh(start, end);
+		cm.appendToMesh(points, faceCounts, faceConnects);
+	}
+
+	int numVertices = points.length();
+	int numFaces = faceCounts.length();
 
 
 	MObject newMesh = meshFS.create(numVertices, numFaces,

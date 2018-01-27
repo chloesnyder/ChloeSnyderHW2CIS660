@@ -1,12 +1,6 @@
 #pragma once
 #include <maya/MPxNode.h>
-#include <maya/MFnNumericAttribute.h>
-#include <maya/MFnTypedAttribute.h>
-#include <maya/MFnUnitAttribute.h>
-#include <maya/MFnMeshData.h>
-#include <maya/MFnMesh.h>
-#include <maya/MTime.h>
-#include "cylinder.h"
+
 
 
 #define McheckErr(stat,msg)             \
@@ -27,15 +21,15 @@ public:
 
 	static MTypeId id;
 	static MObject time;
-	static MObject defaultAngle;
-	static MObject defaultStepSize;
+	static MObject angle;
+	static MObject step_size;
 	static MObject grammarFile;
 	static MObject outputGeometry;
 
 	static MString path;
 
 protected:
-	MObject createMesh(const MTime& time, MObject& outData, MStatus& stat);
+	MObject createMesh(const MTime& time, const float& angle, const float &step, const MString& grammar, MObject& outData, MStatus& stat);
 
 
 };
