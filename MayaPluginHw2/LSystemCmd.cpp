@@ -1,30 +1,62 @@
+#pragma once
 #include "LSystemCmd.h"
 
 
-#include <maya/MGlobal.h>
-#include <list>
 LSystemCmd::LSystemCmd() : MPxCommand()
 {
 }
 
-LSystemCmd::~LSystemCmd() 
+LSystemCmd::~LSystemCmd()
 {
 }
 
-MStatus LSystemCmd::doIt( const MArgList& args )
+MStatus LSystemCmd::createLSystem(double angle, double step, double iter, MString grammar)
+{
+	LSystem lsystem;
+	lsystem.loadProgramFromString(grammar.asChar());
+	lsystem.setDefaultAngle(angle);
+	lsystem.setDefaultStep(step);
+	std::vector<LSystem::Branch> b;
+
+	for (int i = 0; i < iter; i++)
+	{
+		std::string currIter = lsystem.getIteration(i);
+		lsystem.process(i, b);
+	}
+
+	for (int i = 0; i < b.size(); i++)
+	{
+		vec3 start = b.at(i).first;
+		vec3 end = b.at(i).second;
+
+		std::string c;
+		std::stringstream stringStream;
+		stringStream << "$myCurve = `curve -d 1 -p " << start[0] << " " << start[2] << " " << start[1] << " -p " << end[0] << " " << end[2] << " " << end[1] << "-k 0 -k 1`";
+		c = stringStream.str();
+
+		MString command1 = "global string $myCurve";
+		MString command2 = c.c_str();
+		MString command3 = "circle -r 0.2 -name nurbsCircle1";
+		MString command4 = "select -r nurbsCircle1 curve1";
+		MString command5 = "extrude -ch true -rn false -po 1 -et 2 -ucp 1 -fpt 1 -upn 1 -rotation 0 -scale 1 -rsp 1 nurbsCircle1 $myCurve";
+
+		MGlobal::executeCommand(command1);
+		MGlobal::executeCommand(command2);
+		MGlobal::executeCommand(command3);
+		MGlobal::executeCommand(command4);
+		MGlobal::executeCommand(command5);
+	}
+
+	return MS::kSuccess;
+}
+
+MStatus LSystemCmd::doIt(const MArgList& args)
 {
 
-	MString branchStartX;
-	MString branchStartY;
-	MString branchStartZ;
-	MString branchEndX;
-	MString branchEndY;
-	MString branchEndZ;
-
-	double stepSize;
-	double angle;
-	MString grammar;
-	int numIter;
+	double stepSize = 0;
+	double angle = 0;
+	MString grammar = "";
+	int numIter = 0;
 
 
 	MStatus status;
@@ -35,40 +67,27 @@ MStatus LSystemCmd::doIt( const MArgList& args )
 		return status;
 	}
 
-	if (parser.isFlagSet(STARTX))
+	if (parser.isFlagSet(ANGLE))
 	{
-		parser.getFlagArgument(STARTX, 0, branchStartX);
+		parser.getFlagArgument(ANGLE, 0, angle);
 	}
-	if (parser.isFlagSet(STARTY))
+	if (parser.isFlagSet(STEPSIZE))
 	{
-		parser.getFlagArgument(STARTY, 0, branchStartY);
+		parser.getFlagArgument(STEPSIZE, 0, stepSize);
 	}
-	if (parser.isFlagSet(STARTZ))
+	if (parser.isFlagSet(GRAMMAR))
 	{
-		parser.getFlagArgument(STARTZ, 0, branchStartZ);
+		parser.getFlagArgument(GRAMMAR, 0, grammar);
 	}
-	if (parser.isFlagSet(ENDX))
+	if (parser.isFlagSet(ITER))
 	{
-		parser.getFlagArgument(ENDX, 0, branchEndX);
-	}
-	if (parser.isFlagSet(ENDY))
-	{
-		parser.getFlagArgument(ENDY, 0, branchEndY);
-	}
-	if (parser.isFlagSet(ENDZ))
-	{
-		parser.getFlagArgument(ENDZ, 0, branchEndZ);
+		parser.getFlagArgument(ITER, 0, numIter);
 	}
 
-	MString command = "circle - centerX 0 - centerY 0 - centerZ 0 - name nurbsCircle1 - radius 2; \ncurve -d 1 -p " + branchStartX + " " + branchStartY + " " + branchStartZ + " - p "
-		+ branchEndX + " " + branchEndY + " " + branchEndZ + " -k 0 - k 1 - name curve1;" 
-		+ "\nselect - r nurbsCircle1 curve1 ;" 
-		+ "\nextrude - ch true - rn false - po 1 - et 2 - ucp 1 - fpt 1 - upn 1 - rotation 0 - scale 1 - rsp 1 \"nurbsCircle1\" \"curve1\";";
+	status = createLSystem(angle, stepSize, numIter, grammar);
 
-	status = MGlobal::executeCommand(command);
 	MGlobal::displayInfo("LSystemCmd\n");
 	setResult("LSystemCmd was executed\n");
 
 	return status;
 }
-
