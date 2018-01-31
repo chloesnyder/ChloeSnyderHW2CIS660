@@ -27,12 +27,11 @@
 
 //virtual MStatus compute(const MPlug& plug, MDataBlock& data);
 MObject LSystemNode::time;
-MTypeId LSystemNode::id(0x0);
+MTypeId LSystemNode::id(0x80000);
 MObject LSystemNode::angle;
 MObject LSystemNode::step_size;
 MObject LSystemNode::grammarFile;
 MObject LSystemNode::outputMesh;
-MString LSystemNode::path;
 
 void* LSystemNode::creator()
 {
@@ -202,15 +201,18 @@ MObject LSystemNode::createMesh(const MTime& time, const float& angle, const flo
 	LSystem lsystem;
 	// load grammar file that user selects, set default angle and step size
 	lsystem.loadProgram(grammarFilePath.asChar());
+	//lsystem.loadProgram(grammar.asChar());
 	lsystem.setDefaultAngle(angle);
 	lsystem.setDefaultStep(step);
 	// vector to store all branches processed at each iteration of lsystem
 	std::vector<LSystem::Branch> b;
+	//lsystem.process((int)time.value(), b);
 
 	for (int i = 0; i < t; i++)
 	{
 		std::string currIter = lsystem.getIteration(i);
-		lsystem.process(i, b);
+		lsystem.process((int)time.value(), b);
+		//lsystem.process(i, b);
 	}
 
 	// Create mesh after final iteration

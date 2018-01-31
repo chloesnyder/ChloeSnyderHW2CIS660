@@ -59,11 +59,11 @@ global proc createNode() {
 
     window;
 columnLayout;
-    button -command fileDialog -label "Browse for grammar file";;
+    button -command fileDialog -label "Browse for grammar file";
     $grammarScroll = `scrollField -wordWrap on -text "Grammar"`;
     $iter = `intSliderGrp -minValue 1 -step 1 -changeCommand "iterValueChanged();" -label "Iterations" -field true`;
     $step = `floatSliderGrp -changeCommand "stepValueChanged();" -label "Default step size" -field true`;
     $ang = `floatSliderGrp -minValue -360 -maxValue 360 -changeCommand "angValueChanged();" -label "Default angle" -field true`;
-    button -command ("LSystemCmd -i "+$valIter+" -ss "+$valStep+" -a  "+$valAng+"" + " -g " + $grammar+"") -label "Call LSystem Command"; // Move into createNode command so all one button
-    button -label "Create LSystem Node" -command createNode;
+    button -command ("LSystemCmd -i "+$valIter+" -ss "+$valStep+" -a  "+$valAng+"" + " -g " + $grammar+"") -label "Call LSystem Command"; 
+	button -label "Create LSystem Node" -command createNode;
 showWindow;

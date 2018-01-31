@@ -26,8 +26,7 @@ public:
 	static MObject grammarFile;
 	static MObject outputMesh;
 
-	static MString path;
-
+	
 protected:
 	MObject createMesh(const MTime& time, const float& angle, const float &step, const MString& grammar, MObject& outData, MStatus& stat);
 
