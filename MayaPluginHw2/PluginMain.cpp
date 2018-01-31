@@ -44,6 +44,7 @@ MStatus initializePlugin(MObject obj)
 	char buffer[2048];
 	//MString s = plugin.loadPath();
 	//sprintf_s(buffer, 2048, "source \"%s/LSystemCmd.mel\";", s.asChar());
+	std::string s = plugin.loadPath().asChar();
 	sprintf_s(buffer, 2048, "source \"%s/LSystemCmd\";", plugin.loadPath().asChar());
 	MGlobal::executeCommand(buffer, true);
 
