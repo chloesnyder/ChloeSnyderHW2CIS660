@@ -1,3 +1,4 @@
+
 global string $iter = 0;
 global int $valIter = 0;
 
@@ -56,18 +57,25 @@ global proc createNode() {
 
 }
 
+global proc executeCommand()
+{
+	global string $iter;
+	global string $ang;
+	global string $step;
+	global string $grammar;
+	$valIter = `intSliderGrp -query -value $iter`;
+	$valStep = `floatSliderGrp -query -value $step`;
+	$valAng = `floatSliderGrp -query -value $ang`;
+	LSystemCmd -i $valIter -ss $valStep -a  $valAng -g $grammar;
+}
+
 
     window;
 columnLayout;
     button -command fileDialog -label "Browse for grammar file";
     $grammarScroll = `scrollField -wordWrap on -text "Grammar"`;
     $iter = `intSliderGrp -minValue 1 -step 1 -label "Iterations" -field true`;
-	$valIter = `intSliderGrp -query -value $iter`;
     $step = `floatSliderGrp -label "Default step size" -field true`;
-	$valStep = `floatSliderGrp -query -value $step`;
-    $ang = `floatSliderGrp -minValue -360 -maxValue 360 -label "Default angle" -field true`;
-	$valAng = `floatSliderGrp -query -value $ang`;
-	print("LSystemCmd -i "+$valIter+" -ss "+$valStep+" -a  "+$valAng+"" + " -g " + $grammar+"");
-    button -command ("LSystemCmd -i "+$valIter+" -ss "+$valStep+" -a  "+$valAng+"" + " -g " + $grammar+"") -label "Call LSystem Command"; 
-	button -label "Create LSystem Node" -command createNode;
+	$ang = `floatSliderGrp -minValue -360 -maxValue 360 -label "Default angle" -field true`;
+	button -command "executeCommand();" -label "Call LSystem Command";
 showWindow;
