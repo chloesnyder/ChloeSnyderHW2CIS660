@@ -37,10 +37,10 @@ MStatus LSystemNode::initialize()
 		MFnUnitAttribute::kTime,
 		0.0, &returnStatus);
 	McheckErr(returnStatus, "ERROR creating LSystemNode time attribute\n");
-	CHECK_MSTATUS(unitAttr.setKeyable(true));
-	CHECK_MSTATUS(unitAttr.setStorable(true));
-	CHECK_MSTATUS(unitAttr.setReadable(true));
-	CHECK_MSTATUS(unitAttr.setWritable(true));
+	//CHECK_MSTATUS(unitAttr.setKeyable(true));
+	//CHECK_MSTATUS(unitAttr.setStorable(true));
+	//CHECK_MSTATUS(unitAttr.setReadable(true));
+	//CHECK_MSTATUS(unitAttr.setWritable(true));
 
 	LSystemNode::angle = numAttr.MFnNumericAttribute::create("angle",
 		"a",
@@ -49,10 +49,10 @@ MStatus LSystemNode::initialize()
 		&returnStatus
 	);
 	McheckErr(returnStatus, "ERROR creating LSystemNode angle attribute\n");
-	CHECK_MSTATUS(numAttr.setKeyable(true));
-	CHECK_MSTATUS(numAttr.setStorable(true));
-	CHECK_MSTATUS(numAttr.setReadable(true));
-	CHECK_MSTATUS(numAttr.setWritable(true));
+	//CHECK_MSTATUS(numAttr.setKeyable(true));
+	//CHECK_MSTATUS(numAttr.setStorable(true));
+	//CHECK_MSTATUS(numAttr.setReadable(true));
+	//CHECK_MSTATUS(numAttr.setWritable(true));
 
 	LSystemNode::step_size = numAttr.MFnNumericAttribute::create("step",
 		"ss",
@@ -61,10 +61,10 @@ MStatus LSystemNode::initialize()
 		&returnStatus
 	);
 	McheckErr(returnStatus, "ERROR creating LSystemNode step attribute\n");
-	CHECK_MSTATUS(numAttr.setKeyable(true));
-	CHECK_MSTATUS(numAttr.setStorable(true));
-	CHECK_MSTATUS(numAttr.setReadable(true));
-	CHECK_MSTATUS(numAttr.setWritable(true));
+	//CHECK_MSTATUS(numAttr.setKeyable(true));
+	//CHECK_MSTATUS(numAttr.setStorable(true));
+	//CHECK_MSTATUS(numAttr.setReadable(true));
+	//CHECK_MSTATUS(numAttr.setWritable(true));
 
 
 	LSystemNode::grammarFile = typedAttr.MFnTypedAttribute::create("grammar",
@@ -73,19 +73,19 @@ MStatus LSystemNode::initialize()
 		&returnStatus
 	);
 	McheckErr(returnStatus, "ERROR creating LSystemNode grammar attribute\n");
-	CHECK_MSTATUS(typedAttr.setKeyable(true));
-	CHECK_MSTATUS(typedAttr.setStorable(true));
-	CHECK_MSTATUS(typedAttr.setReadable(true));
-	CHECK_MSTATUS(typedAttr.setWritable(true));
+	//CHECK_MSTATUS(typedAttr.setKeyable(true));
+	//CHECK_MSTATUS(typedAttr.setStorable(true));
+	//CHECK_MSTATUS(typedAttr.setReadable(true));
+	//CHECK_MSTATUS(typedAttr.setWritable(true));
 
 	LSystemNode::outputMesh = typedAttr.create("outputMesh", "out",
 		MFnData::kMesh,
 		&returnStatus);
 	McheckErr(returnStatus, "ERROR creating LSystemNode output attribute\n");
-	CHECK_MSTATUS(typedAttr.setKeyable(false));
+	//CHECK_MSTATUS(typedAttr.setKeyable(false));
 	CHECK_MSTATUS(typedAttr.setStorable(false));
-	CHECK_MSTATUS(typedAttr.setReadable(true));
-	CHECK_MSTATUS(typedAttr.setWritable(false));
+	//CHECK_MSTATUS(typedAttr.setReadable(true));
+	//CHECK_MSTATUS(typedAttr.setWritable(false));
 
 
 	returnStatus = addAttribute(LSystemNode::time);
@@ -157,9 +157,9 @@ MStatus LSystemNode::compute(const MPlug& plug, MDataBlock& data)
 		data.setClean(plug);
 
 	}
-	else {
-		return MS::kUnknownParameter;
-	}
+	
+
+	return MS::kSuccess;
 }
 
 MObject LSystemNode::createMesh(const MTime& time, const float& angle, const float &step, const MString& grammar, MObject& outData, MStatus& stat)
@@ -172,27 +172,20 @@ MObject LSystemNode::createMesh(const MTime& time, const float& angle, const flo
 	MPoint end;
 
 
-	int t = (int)time.as(MTime::kFilm);
 	MObject plugObj = MFnPlugin::findPlugin("LSystem");
 	MFnPlugin plugin(plugObj);
-	MString grammarFilePath = plugin.loadPath() + "/" + grammar;
+	MString grammarFilePath = plugin.loadPath() + "/plants/" + grammar;
 
 	LSystem lsystem;
 	// load grammar file that user selects, set default angle and step size
+
 	lsystem.loadProgram(grammarFilePath.asChar());
-	//lsystem.loadProgram(grammar.asChar());
 	lsystem.setDefaultAngle(angle);
 	lsystem.setDefaultStep(step);
 	// vector to store all branches processed at each iteration of lsystem
 	std::vector<LSystem::Branch> b;
-	//lsystem.process((int)time.value(), b);
 
-	for (int i = 0; i < t; i++)
-	{
-		std::string currIter = lsystem.getIteration(i);
-		lsystem.process((int)time.value(), b);
-		//lsystem.process(i, b);
-	}
+	lsystem.process((int)time.value(), b);
 
 	// Create mesh after final iteration
 	for (int i = 0; i < b.size(); i++)

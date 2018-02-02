@@ -1,49 +1,24 @@
 
-global string $iter = 0;
 global int $valIter = 0;
 
-global string $step = 0;
 global float $valStep = 0;
 
-global string $ang = 0;
 global float $valAng = 0;
 
 global string $grammarPath = 0;
 global string $grammar = 0;
-global string $grammarScroll = 0;
-
-global proc iterValueChanged() {
-	global string $iter;
-	global int $valIter;
-
-	$valIter = `intSliderGrp -query -value $iter`;
-}
-
-global proc stepValueChanged() {
-	global string $step;
-	global float $valStep;
-
-	$valStep = `floatSliderGrp -query -value $step`;
-}
-
-global proc angValueChanged() {
-	global string $ang;
-	global float $valAng;
-
-	$valAng = `floatSliderGrp -query -value $ang`;
-}
 
 global proc fileDialog()
 {
 	global string $grammarPath;
 	global string $grammar;
-	global string $grammarScroll;
 
 
 	$grammarPath = `fileDialog -dm "*.txt"`;
 	$file = `fopen $grammarPath "r"`;
     $grammar = `fread $file $grammar`;
-    scrollField -edit -text $grammar $grammarScroll;
+	print $grammar;
+    scrollField -edit -text $grammar grammarScroll;
     fclose $file;
 }
 
@@ -59,23 +34,28 @@ global proc createNode() {
 
 global proc executeCommand()
 {
-	global string $iter;
-	global string $ang;
-	global string $step;
 	global string $grammar;
-	$valIter = `intSliderGrp -query -value $iter`;
-	$valStep = `floatSliderGrp -query -value $step`;
-	$valAng = `floatSliderGrp -query -value $ang`;
+	$valIter = `intSliderGrp -query -value iter`;
+	$valStep = `floatSliderGrp -query -value step`;
+	$valAng = `floatSliderGrp -query -value ang`;
 	LSystemCmd -i $valIter -ss $valStep -a  $valAng -g $grammar;
 }
 
 
+global proc windowFunction()
+{
     window;
-columnLayout;
-    button -command fileDialog -label "Browse for grammar file";
-    $grammarScroll = `scrollField -wordWrap on -text "Grammar"`;
-    $iter = `intSliderGrp -minValue 1 -step 1 -label "Iterations" -field true`;
-    $step = `floatSliderGrp -label "Default step size" -field true`;
-	$ang = `floatSliderGrp -minValue -360 -maxValue 360 -label "Default angle" -field true`;
-	button -command "executeCommand();" -label "Call LSystem Command";
-showWindow;
+		columnLayout;
+		scrollField -wordWrap on -text "Grammar" grammarScroll;
+		button -command fileDialog -label "Browse for grammar file";
+		intSliderGrp -minValue 1 -step 1 -label "Iterations" -field true iter;
+		floatSliderGrp -label "Default step size" -field true step;
+		floatSliderGrp -minValue -360 -maxValue 360 -label "Default angle" -field true ang;
+		button -command "executeCommand();" -label "Call LSystem Command";
+	showWindow;
+}
+
+
+menu -parent MayaWindow -label "L System Command" -tearOff true menu1;
+	menuItem -label "LSystem Command" -command "windowFunction();";
+	menuItem -label "Create node" -command "createNode();";
